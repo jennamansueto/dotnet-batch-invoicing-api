@@ -1,0 +1,9 @@
+## .NET Framework
+bin/
+obj/
+packages/
+*.user
+*.suo
+*.cache
+*.vs/
+TestResults/

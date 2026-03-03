@@ -1,0 +1,38 @@
+# Contoso.Invoicing.Legacy Build Pipeline
+# Placeholder for Azure DevOps / Jenkins / GitHub Actions
+
+trigger:
+  branches:
+    include:
+      - main
+      - release/*
+
+pool:
+  vmImage: 'windows-latest'
+
+variables:
+  solution: 'Contoso.Invoicing.Legacy.sln'
+  buildConfiguration: 'Release'
+
+steps:
+  - task: NuGetToolInstaller@1
+    displayName: 'Install NuGet'
+
+  - task: NuGetCommand@2
+    displayName: 'Restore NuGet Packages'
+    inputs:
+      restoreSolution: '$(solution)'
+
+  - task: VSBuild@1
+    displayName: 'Build Solution'
+    inputs:
+      solution: '$(solution)'
+      configuration: '$(buildConfiguration)'
+
+  - task: VSTest@2
+    displayName: 'Run Unit Tests'
+    inputs:
+      testAssemblyVer2: |
+        **\*UnitTests*.dll
+        !**\obj\**
+      configuration: '$(buildConfiguration)'
