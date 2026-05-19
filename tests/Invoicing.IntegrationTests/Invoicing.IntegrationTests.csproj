@@ -3,17 +3,16 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>disable</Nullable>
-    <RootNamespace>Contoso.Invoicing.UnitTests</RootNamespace>
+    <RootNamespace>Contoso.Invoicing.IntegrationTests</RootNamespace>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
     <PackageReference Include="xunit" Version="2.6.6" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.5.6" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Invoicing.Application\Invoicing.Application.csproj" />
-    <ProjectReference Include="..\..\src\Invoicing.Domain\Invoicing.Domain.csproj" />
-    <ProjectReference Include="..\..\src\Invoicing.Infrastructure\Invoicing.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\Invoicing.Api\Invoicing.Api.csproj" />
   </ItemGroup>
 </Project>

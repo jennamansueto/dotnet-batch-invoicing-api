@@ -1,28 +1,34 @@
-using System.Configuration;
+using System;
 using System.Net;
 using System.Threading.Tasks;
-using Microsoft.Owin;
+using Contoso.Invoicing.Api.Configuration;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Options;
 
 namespace Contoso.Invoicing.Api.Middleware
 {
-    public class ApiKeyMiddleware : OwinMiddleware
+    public class ApiKeyMiddleware
     {
         private const string ApiKeyHeader = "X-Api-Key";
+        private readonly RequestDelegate _next;
 
-        public ApiKeyMiddleware(OwinMiddleware next) : base(next) { }
+        public ApiKeyMiddleware(RequestDelegate next)
+        {
+            _next = next;
+        }
 
-        public override async Task Invoke(IOwinContext context)
+        public async Task InvokeAsync(HttpContext context, IOptions<InvoicingOptions> options)
         {
             var path = context.Request.Path.Value ?? string.Empty;
 
-            if (path.TrimEnd('/').Equals("/api/health", System.StringComparison.OrdinalIgnoreCase))
+            if (path.TrimEnd('/').Equals("/health", StringComparison.OrdinalIgnoreCase))
             {
-                await Next.Invoke(context);
+                await _next(context);
                 return;
             }
 
-            var providedKey = context.Request.Headers.Get(ApiKeyHeader);
-            var expectedKey = ConfigurationManager.AppSettings["ApiKey"];
+            var providedKey = context.Request.Headers[ApiKeyHeader].ToString();
+            var expectedKey = options.Value.ApiKey;
 
             if (string.IsNullOrWhiteSpace(providedKey) || providedKey != expectedKey)
             {
@@ -32,7 +38,7 @@ namespace Contoso.Invoicing.Api.Middleware
                 return;
             }
 
-            await Next.Invoke(context);
+            await _next(context);
         }
     }
 }

@@ -1,27 +1,32 @@
 using System;
 using System.Collections.Generic;
-using System.Web.Http;
+using System.Threading.Tasks;
 using Contoso.Invoicing.Application.Dtos;
 using Contoso.Invoicing.Application.Services;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Contoso.Invoicing.Api.Controllers
 {
-    [RoutePrefix("api/batches")]
-    public class BatchesController : ApiController
+    [ApiController]
+    [Route("api/batches")]
+    public class BatchesController : ControllerBase
     {
-        private IBatchService BatchService =>
-            (IBatchService)Configuration.Properties["IBatchService"];
+        private readonly IBatchService _batchService;
 
-        [HttpPost]
-        [Route("")]
-        public IHttpActionResult CreateBatch([FromBody] CreateBatchRequest request)
+        public BatchesController(IBatchService batchService)
+        {
+            _batchService = batchService;
+        }
+
+        [HttpPost("")]
+        public async Task<ActionResult<BatchSummaryDto>> CreateBatch([FromBody] CreateBatchRequest request)
         {
             if (request == null)
                 return BadRequest("Request body is required.");
 
             try
             {
-                var result = BatchService.CreateBatch(request);
+                var result = await _batchService.CreateBatchAsync(request);
                 return Created($"api/batches/{result.BatchId}", result);
             }
             catch (ArgumentException ex)
@@ -30,13 +35,12 @@ namespace Contoso.Invoicing.Api.Controllers
             }
         }
 
-        [HttpPost]
-        [Route("{batchId:guid}/run")]
-        public IHttpActionResult RunBatch(Guid batchId)
+        [HttpPost("{batchId:guid}/run")]
+        public async Task<ActionResult<BatchSummaryDto>> RunBatch(Guid batchId)
         {
             try
             {
-                var result = BatchService.RunBatch(batchId);
+                var result = await _batchService.RunBatchAsync(batchId);
                 return Ok(result);
             }
             catch (KeyNotFoundException)
@@ -49,13 +53,12 @@ namespace Contoso.Invoicing.Api.Controllers
             }
         }
 
-        [HttpGet]
-        [Route("{batchId:guid}")]
-        public IHttpActionResult GetBatch(Guid batchId)
+        [HttpGet("{batchId:guid}")]
+        public async Task<ActionResult<BatchSummaryDto>> GetBatch(Guid batchId)
         {
             try
             {
-                var result = BatchService.GetBatch(batchId);
+                var result = await _batchService.GetBatchAsync(batchId);
                 return Ok(result);
             }
             catch (KeyNotFoundException)
@@ -64,13 +67,12 @@ namespace Contoso.Invoicing.Api.Controllers
             }
         }
 
-        [HttpGet]
-        [Route("{batchId:guid}/invoices")]
-        public IHttpActionResult ListInvoices(Guid batchId)
+        [HttpGet("{batchId:guid}/invoices")]
+        public async Task<ActionResult<System.Collections.Generic.IReadOnlyList<InvoiceDto>>> ListInvoices(Guid batchId)
         {
             try
             {
-                var result = BatchService.ListInvoices(batchId);
+                var result = await _batchService.ListInvoicesAsync(batchId);
                 return Ok(result);
             }
             catch (KeyNotFoundException)
