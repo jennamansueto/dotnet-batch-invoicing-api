@@ -1,31 +1,30 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Contoso.Invoicing.Application.Dtos;
 using Contoso.Invoicing.Application.Services;
-using Contoso.Invoicing.Domain.Models;
 using Contoso.Invoicing.Infrastructure.Events;
 using Contoso.Invoicing.Infrastructure.Repositories;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.Extensions.Logging.Abstractions;
+using Xunit;
 
 namespace Contoso.Invoicing.UnitTests
 {
-    [TestClass]
     public class BatchServiceTests
     {
-        private BatchService _service;
+        private readonly BatchService _service;
 
-        [TestInitialize]
-        public void Setup()
+        public BatchServiceTests()
         {
             _service = new BatchService(
                 new InMemoryInvoiceBatchRepository(),
                 new InMemoryInvoiceRepository(),
-                new ConsoleEventPublisher());
+                new ConsoleEventPublisher(NullLogger<ConsoleEventPublisher>.Instance));
         }
 
-        [TestMethod]
-        public void CreateBatch_ReturnsPendingBatch()
+        [Fact]
+        public async Task CreateBatch_ReturnsPendingBatch()
         {
             var request = new CreateBatchRequest
             {
@@ -35,15 +34,15 @@ namespace Contoso.Invoicing.UnitTests
                 RequestedBy = "admin@contoso.com"
             };
 
-            var result = _service.CreateBatch(request);
+            var result = await _service.CreateBatchAsync(request);
 
-            Assert.AreEqual("Pending", result.Status);
-            Assert.AreEqual("admin@contoso.com", result.RequestedBy);
-            Assert.AreNotEqual(Guid.Empty, result.BatchId);
+            Assert.Equal("Pending", result.Status);
+            Assert.Equal("admin@contoso.com", result.RequestedBy);
+            Assert.NotEqual(Guid.Empty, result.BatchId);
         }
 
-        [TestMethod]
-        public void RunBatch_CompletesAndGeneratesInvoices()
+        [Fact]
+        public async Task RunBatch_CompletesAndGeneratesInvoices()
         {
             var request = new CreateBatchRequest
             {
@@ -53,16 +52,16 @@ namespace Contoso.Invoicing.UnitTests
                 RequestedBy = "admin@contoso.com"
             };
 
-            var batch = _service.CreateBatch(request);
-            var result = _service.RunBatch(batch.BatchId);
+            var batch = await _service.CreateBatchAsync(request);
+            var result = await _service.RunBatchAsync(batch.BatchId);
 
-            Assert.AreEqual("Completed", result.Status);
-            Assert.AreEqual(3, result.InvoiceCount);
-            Assert.IsTrue(result.GrandTotalAmount > 0);
+            Assert.Equal("Completed", result.Status);
+            Assert.Equal(3, result.InvoiceCount);
+            Assert.True(result.GrandTotalAmount > 0);
         }
 
-        [TestMethod]
-        public void ListInvoices_AfterRun_ReturnsCorrectCount()
+        [Fact]
+        public async Task ListInvoices_AfterRun_ReturnsCorrectCount()
         {
             var request = new CreateBatchRequest
             {
@@ -72,24 +71,23 @@ namespace Contoso.Invoicing.UnitTests
                 RequestedBy = "finance@contoso.com"
             };
 
-            var batch = _service.CreateBatch(request);
-            _service.RunBatch(batch.BatchId);
-            var invoices = _service.ListInvoices(batch.BatchId);
+            var batch = await _service.CreateBatchAsync(request);
+            await _service.RunBatchAsync(batch.BatchId);
+            var invoices = await _service.ListInvoicesAsync(batch.BatchId);
 
-            Assert.AreEqual(2, invoices.Count);
-            Assert.IsTrue(invoices.All(i => i.Currency == "USD"));
+            Assert.Equal(2, invoices.Count);
+            Assert.True(invoices.All(i => i.Currency == "USD"));
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(KeyNotFoundException))]
-        public void GetBatch_NonExistent_Throws()
+        [Fact]
+        public async Task GetBatch_NonExistent_Throws()
         {
-            _service.GetBatch(Guid.NewGuid());
+            await Assert.ThrowsAsync<KeyNotFoundException>(
+                () => _service.GetBatchAsync(Guid.NewGuid()));
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException))]
-        public void RunBatch_AlreadyCompleted_Throws()
+        [Fact]
+        public async Task RunBatch_AlreadyCompleted_Throws()
         {
             var request = new CreateBatchRequest
             {
@@ -99,9 +97,11 @@ namespace Contoso.Invoicing.UnitTests
                 RequestedBy = "admin@contoso.com"
             };
 
-            var batch = _service.CreateBatch(request);
-            _service.RunBatch(batch.BatchId);
-            _service.RunBatch(batch.BatchId);
+            var batch = await _service.CreateBatchAsync(request);
+            await _service.RunBatchAsync(batch.BatchId);
+
+            await Assert.ThrowsAsync<InvalidOperationException>(
+                () => _service.RunBatchAsync(batch.BatchId));
         }
     }
 }

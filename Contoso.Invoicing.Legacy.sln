@@ -1,21 +1,23 @@
-
+﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.757
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Invoicing.Api", "src\Invoicing.Api\Invoicing.Api.csproj", "{A1B2C3D4-0001-0001-0001-000000000001}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Invoicing.Api", "src\Invoicing.Api\Invoicing.Api.csproj", "{A1B2C3D4-0001-0001-0001-000000000001}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Invoicing.Application", "src\Invoicing.Application\Invoicing.Application.csproj", "{A1B2C3D4-0002-0002-0002-000000000002}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Invoicing.Application", "src\Invoicing.Application\Invoicing.Application.csproj", "{A1B2C3D4-0002-0002-0002-000000000002}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Invoicing.Domain", "src\Invoicing.Domain\Invoicing.Domain.csproj", "{A1B2C3D4-0003-0003-0003-000000000003}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Invoicing.Domain", "src\Invoicing.Domain\Invoicing.Domain.csproj", "{A1B2C3D4-0003-0003-0003-000000000003}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Invoicing.Infrastructure", "src\Invoicing.Infrastructure\Invoicing.Infrastructure.csproj", "{A1B2C3D4-0004-0004-0004-000000000004}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Invoicing.Infrastructure", "src\Invoicing.Infrastructure\Invoicing.Infrastructure.csproj", "{A1B2C3D4-0004-0004-0004-000000000004}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Invoicing.UnitTests", "tests\Invoicing.UnitTests\Invoicing.UnitTests.csproj", "{A1B2C3D4-0005-0005-0005-000000000005}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Invoicing.UnitTests", "tests\Invoicing.UnitTests\Invoicing.UnitTests.csproj", "{A1B2C3D4-0005-0005-0005-000000000005}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{E0000001-0000-0000-0000-000000000001}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{E0000002-0000-0000-0000-000000000002}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Invoicing.IntegrationTests", "tests\Invoicing.IntegrationTests\Invoicing.IntegrationTests.csproj", "{F41AE5F7-9C67-4D67-BFB8-5F40800EA747}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -43,6 +45,10 @@ Global
 		{A1B2C3D4-0005-0005-0005-000000000005}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A1B2C3D4-0005-0005-0005-000000000005}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A1B2C3D4-0005-0005-0005-000000000005}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F41AE5F7-9C67-4D67-BFB8-5F40800EA747}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F41AE5F7-9C67-4D67-BFB8-5F40800EA747}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F41AE5F7-9C67-4D67-BFB8-5F40800EA747}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F41AE5F7-9C67-4D67-BFB8-5F40800EA747}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -53,6 +59,7 @@ Global
 		{A1B2C3D4-0003-0003-0003-000000000003} = {E0000001-0000-0000-0000-000000000001}
 		{A1B2C3D4-0004-0004-0004-000000000004} = {E0000001-0000-0000-0000-000000000001}
 		{A1B2C3D4-0005-0005-0005-000000000005} = {E0000002-0000-0000-0000-000000000002}
+		{F41AE5F7-9C67-4D67-BFB8-5F40800EA747} = {E0000002-0000-0000-0000-000000000002}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D0000001-0000-0000-0000-000000000001}

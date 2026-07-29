@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Concurrent;
+using System.Threading.Tasks;
 using Contoso.Invoicing.Domain.Models;
 using Contoso.Invoicing.Domain.Repositories;
 
@@ -10,22 +11,24 @@ namespace Contoso.Invoicing.Infrastructure.Repositories
         private static readonly ConcurrentDictionary<Guid, InvoiceBatch> Store =
             new ConcurrentDictionary<Guid, InvoiceBatch>();
 
-        public void Add(InvoiceBatch batch)
+        public Task AddAsync(InvoiceBatch batch)
         {
             if (batch == null) throw new ArgumentNullException(nameof(batch));
             Store[batch.BatchId] = batch;
+            return Task.CompletedTask;
         }
 
-        public InvoiceBatch GetById(Guid batchId)
+        public Task<InvoiceBatch> GetByIdAsync(Guid batchId)
         {
             Store.TryGetValue(batchId, out var batch);
-            return batch;
+            return Task.FromResult(batch);
         }
 
-        public void Update(InvoiceBatch batch)
+        public Task UpdateAsync(InvoiceBatch batch)
         {
             if (batch == null) throw new ArgumentNullException(nameof(batch));
             Store[batch.BatchId] = batch;
+            return Task.CompletedTask;
         }
     }
 }
