@@ -1,16 +1,27 @@
 using System;
-using System.Diagnostics;
+using System.Threading.Tasks;
 using Contoso.Invoicing.Domain.Events;
+using Microsoft.Extensions.Logging;
 
 namespace Contoso.Invoicing.Infrastructure.Events
 {
     public class ConsoleEventPublisher : IEventPublisher
     {
-        public void Publish<T>(T @event) where T : class
+        private readonly ILogger<ConsoleEventPublisher> _logger;
+
+        public ConsoleEventPublisher(ILogger<ConsoleEventPublisher> logger)
         {
-            var message = $"[EVENT] {DateTime.UtcNow:O} | {typeof(T).Name} | {@event}";
-            Trace.TraceInformation(message);
-            System.Diagnostics.Debug.WriteLine(message);
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        }
+
+        public Task PublishAsync<T>(T @event) where T : class
+        {
+            _logger.LogInformation(
+                "[EVENT] {PublishedAt:O} | {EventName} | {Event}",
+                DateTime.UtcNow,
+                typeof(T).Name,
+                @event);
+            return Task.CompletedTask;
         }
     }
 }

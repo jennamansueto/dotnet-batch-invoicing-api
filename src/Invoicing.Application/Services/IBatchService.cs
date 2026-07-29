@@ -1,14 +1,15 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Contoso.Invoicing.Application.Dtos;
 
 namespace Contoso.Invoicing.Application.Services
 {
     public interface IBatchService
     {
-        BatchSummaryDto CreateBatch(CreateBatchRequest request);
-        BatchSummaryDto RunBatch(Guid batchId);
-        BatchSummaryDto GetBatch(Guid batchId);
-        IReadOnlyList<InvoiceDto> ListInvoices(Guid batchId);
+        Task<BatchSummaryDto> CreateBatchAsync(CreateBatchRequest request);
+        Task<BatchSummaryDto> RunBatchAsync(Guid batchId);
+        Task<BatchSummaryDto> GetBatchAsync(Guid batchId);
+        Task<IReadOnlyList<InvoiceDto>> ListInvoicesAsync(Guid batchId);
     }
 }

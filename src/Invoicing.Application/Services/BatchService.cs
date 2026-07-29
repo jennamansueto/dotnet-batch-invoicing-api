@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Contoso.Invoicing.Application.Dtos;
 using Contoso.Invoicing.Domain.Events;
 using Contoso.Invoicing.Domain.Models;
@@ -25,7 +26,7 @@ namespace Contoso.Invoicing.Application.Services
             _eventPublisher = eventPublisher ?? throw new ArgumentNullException(nameof(eventPublisher));
         }
 
-        public BatchSummaryDto CreateBatch(CreateBatchRequest request)
+        public async Task<BatchSummaryDto> CreateBatchAsync(CreateBatchRequest request)
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
             if (request.CustomerIds == null || !request.CustomerIds.Any())
@@ -39,13 +40,13 @@ namespace Contoso.Invoicing.Application.Services
                 RequestedBy = request.RequestedBy
             };
 
-            _batchRepo.Add(batch);
+            await _batchRepo.AddAsync(batch).ConfigureAwait(false);
             return MapToSummary(batch);
         }
 
-        public BatchSummaryDto RunBatch(Guid batchId)
+        public async Task<BatchSummaryDto> RunBatchAsync(Guid batchId)
         {
-            var batch = _batchRepo.GetById(batchId);
+            var batch = await _batchRepo.GetByIdAsync(batchId).ConfigureAwait(false);
             if (batch == null)
                 throw new KeyNotFoundException($"Batch {batchId} not found.");
 
@@ -53,7 +54,7 @@ namespace Contoso.Invoicing.Application.Services
                 throw new InvalidOperationException($"Batch is in '{batch.Status}' state and cannot be run.");
 
             batch.Status = BatchStatus.Running;
-            _batchRepo.Update(batch);
+            await _batchRepo.UpdateAsync(batch).ConfigureAwait(false);
 
             try
             {
@@ -71,7 +72,7 @@ namespace Contoso.Invoicing.Application.Services
                         Total = lineTotal
                     };
 
-                    _invoiceRepo.Add(invoice);
+                    await _invoiceRepo.AddAsync(invoice).ConfigureAwait(false);
                     grandTotal = grandTotal.Add(lineTotal);
                 }
 
@@ -79,35 +80,39 @@ namespace Contoso.Invoicing.Application.Services
                 batch.GrandTotal = grandTotal;
                 batch.Status = BatchStatus.Completed;
                 batch.CompletedAt = DateTime.UtcNow;
-                _batchRepo.Update(batch);
+                await _batchRepo.UpdateAsync(batch).ConfigureAwait(false);
 
-                _eventPublisher.Publish(new { EventType = "InvoiceBatchCompleted", batch.BatchId, batch.InvoiceCount });
+                await _eventPublisher
+                    .PublishAsync(new { EventType = "InvoiceBatchCompleted", batch.BatchId, batch.InvoiceCount })
+                    .ConfigureAwait(false);
             }
             catch (Exception ex)
             {
                 batch.Status = BatchStatus.Failed;
                 batch.FailureReason = ex.Message;
-                _batchRepo.Update(batch);
+                await _batchRepo.UpdateAsync(batch).ConfigureAwait(false);
             }
 
             return MapToSummary(batch);
         }
 
-        public BatchSummaryDto GetBatch(Guid batchId)
+        public async Task<BatchSummaryDto> GetBatchAsync(Guid batchId)
         {
-            var batch = _batchRepo.GetById(batchId);
+            var batch = await _batchRepo.GetByIdAsync(batchId).ConfigureAwait(false);
             if (batch == null)
                 throw new KeyNotFoundException($"Batch {batchId} not found.");
             return MapToSummary(batch);
         }
 
-        public IReadOnlyList<InvoiceDto> ListInvoices(Guid batchId)
+        public async Task<IReadOnlyList<InvoiceDto>> ListInvoicesAsync(Guid batchId)
         {
-            var batch = _batchRepo.GetById(batchId);
+            var batch = await _batchRepo.GetByIdAsync(batchId).ConfigureAwait(false);
             if (batch == null)
                 throw new KeyNotFoundException($"Batch {batchId} not found.");
 
-            return _invoiceRepo.GetByBatchId(batchId)
+            var invoices = await _invoiceRepo.GetByBatchIdAsync(batchId).ConfigureAwait(false);
+
+            return invoices
                 .Select(inv => new InvoiceDto
                 {
                     InvoiceId = inv.InvoiceId,

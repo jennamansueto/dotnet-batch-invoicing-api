@@ -1,0 +1,14 @@
+<Project>
+
+  <PropertyGroup>
+    <Company>Contoso Ltd.</Company>
+    <Product>Contoso.Invoicing</Product>
+    <Copyright>Copyright © Contoso Ltd. 2023</Copyright>
+    <Version>1.0.0</Version>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+  </PropertyGroup>
+
+</Project>
